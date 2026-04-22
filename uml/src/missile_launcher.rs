@@ -1,10 +1,9 @@
 use std::time::Duration;
 
-use log::debug;
-use rusb::{Context, DeviceHandle, UsbContext};
+use rusb::{Context, DeviceHandle, Error, UsbContext};
 
-use crate::Command;
 use crate::control::Control;
+use crate::Command;
 
 const VID: u16 = 0x0416;
 const PID: u16 = 0x9391;
@@ -27,31 +26,16 @@ impl MissileLauncher {
     ///
     /// # Errors
     ///
-    /// Returns an [`rusb::Error`] if opening the device fails.
+    /// Returns an [`Error`] if opening the device fails.
     pub fn from_descriptor(vid: u16, pid: u16) -> rusb::Result<Self> {
-        for device in Context::new()?.devices()?.iter() {
-            match device.device_descriptor() {
-                Ok(descriptor) => {
-                    debug!("Found device: {descriptor:?}");
-
-                    if descriptor.vendor_id() == vid && descriptor.product_id() == pid {
-                        return device.open().map(Self::new);
-                    }
-                }
-                Err(error) => {
-                    debug!("{error}")
-                }
-            };
-        }
-
-        Err(rusb::Error::NoDevice)
+        Context::new()?.open_device_with_vid_pid(vid, pid).ok_or(Error::NoDevice).map(Self::new)
     }
 
     /// Open the missile launcher from the default VID and PID.
     ///
     /// # Errors
     ///
-    /// Returns an [`rusb::Error`] if opening the device fails.
+    /// Returns an [`Error`] if opening the device fails.
     pub fn open() -> rusb::Result<Self> {
         Self::from_descriptor(VID, PID)
     }
@@ -60,7 +44,7 @@ impl MissileLauncher {
     ///
     /// # Errors
     ///
-    /// Returns an [`rusb::Error`] if sending the command fails.
+    /// Returns an [`Error`] if sending the command fails.
     pub fn send_command_with_timeout(
         &mut self,
         command: Command,
@@ -74,7 +58,7 @@ impl MissileLauncher {
     ///
     /// # Errors
     ///
-    /// Returns an [`rusb::Error`] if sending the command fails.
+    /// Returns an [`Error`] if sending the command fails.
     pub fn send_command(&mut self, command: Command) -> rusb::Result<()> {
         self.send_command_with_timeout(command, DEFAULT_TIMEOUT)
             .map(drop)
