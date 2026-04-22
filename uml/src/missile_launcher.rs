@@ -27,7 +27,7 @@ impl MissileLauncher {
     /// # Errors
     ///
     /// Returns an [`Error`] if opening the device fails.
-    pub fn from_descriptor(vid: u16, pid: u16) -> rusb::Result<Self> {
+    pub fn open_with_vid_pid(vid: u16, pid: u16) -> rusb::Result<Self> {
         Context::new()?.open_device_with_vid_pid(vid, pid).ok_or(Error::NoDevice).map(Self::new)
     }
 
@@ -37,7 +37,7 @@ impl MissileLauncher {
     ///
     /// Returns an [`Error`] if opening the device fails.
     pub fn open() -> rusb::Result<Self> {
-        Self::from_descriptor(VID, PID)
+        Self::open_with_vid_pid(VID, PID)
     }
 
     /// Send a command with a given timeout to the missile launcher.
