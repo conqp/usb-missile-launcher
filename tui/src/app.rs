@@ -1,17 +1,16 @@
 use std::io;
-use std::num::TryFromIntError;
 
-use crossterm::event::{
-    Event, KeyCode, KeyEvent, KeyEventKind, KeyboardEnhancementFlags, PushKeyboardEnhancementFlags,
-};
-use crossterm::terminal::enable_raw_mode;
-use crossterm::{event, execute};
+use crossterm::event;
+use crossterm::event::{Event, KeyCode, KeyEvent, KeyEventKind};
 use log::{debug, error, warn};
 use ratatui::layout::Flex;
 use ratatui::prelude::*;
-use ratatui::widgets::{Block, Borders, Paragraph};
+use ratatui::widgets::{Block, Borders};
 use ratatui::{DefaultTerminal, Frame};
 use uml::{Command, Control, MissileLauncher};
+
+use crate::extended_terminal::ExtendedTerminal;
+use crate::make_table::MakeTable;
 
 #[derive(Debug)]
 pub struct App {
@@ -37,7 +36,9 @@ impl App {
     ///
     /// Returns an [`io::Error`] if any I/O error occurs.
     pub fn run(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
-        setup_extended_terminal_mode(terminal).unwrap_or_else(|error| warn!("{error}"));
+        terminal
+            .setup_extended_events()
+            .unwrap_or_else(|error| warn!("{error}"));
 
         while !self.exit {
             terminal.draw(|frame| self.draw(frame))?;
@@ -127,52 +128,8 @@ impl Widget for &App {
 
         outer_block.render(centered, buf);
 
-        make_table(
-            [["", "^", ""], ["<", "<Enter>", ">"], ["", "v", ""]],
-            inner,
-            buf,
-        )
-        .expect("Table fits into u16.");
+        inner
+            .make_table([["", "^", ""], ["<", "<Enter>", ">"], ["", "v", ""]], buf)
+            .expect("Table fits into u16.");
     }
-}
-
-fn setup_extended_terminal_mode(terminal: &mut DefaultTerminal) -> io::Result<()> {
-    enable_raw_mode()?;
-
-    execute!(
-        terminal.backend_mut(),
-        PushKeyboardEnhancementFlags(KeyboardEnhancementFlags::REPORT_EVENT_TYPES)
-    )
-}
-
-fn make_table<'a, const COLS: usize, const ROWS: usize, T>(
-    elements: [[T; COLS]; ROWS],
-    parent: Rect,
-    buffer: &mut Buffer,
-) -> Result<(), TryFromIntError>
-where
-    T: Into<Text<'a>>,
-{
-    // Build 3 rows inside inner block
-    let rows = Layout::default()
-        .direction(Direction::Vertical)
-        .constraints([Constraint::Percentage(u16::try_from(100usize / ROWS)?); ROWS])
-        .split(parent);
-
-    for (row_area, row) in rows.iter().zip(elements) {
-        let cols = Layout::default()
-            .direction(Direction::Horizontal)
-            .constraints([Constraint::Percentage(u16::try_from(100usize / COLS)?); COLS])
-            .split(*row_area);
-
-        for (cell_area, cell) in cols.iter().zip(row) {
-            let cell = Paragraph::new(cell)
-                .style(Style::default())
-                .alignment(Alignment::Center);
-
-            cell.render(*cell_area, buffer);
-        }
-    }
-
-    Ok(())
 }
