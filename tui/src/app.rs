@@ -1,8 +1,11 @@
 use std::io;
 
-use crossterm::event;
-use crossterm::event::{Event, KeyCode, KeyEvent, KeyEventKind};
-use log::{debug, error};
+use crossterm::event::{
+    Event, KeyCode, KeyEvent, KeyEventKind, KeyboardEnhancementFlags, PushKeyboardEnhancementFlags,
+};
+use crossterm::terminal::enable_raw_mode;
+use crossterm::{event, execute};
+use log::{debug, error, warn};
 use ratatui::layout::Flex;
 use ratatui::prelude::*;
 use ratatui::widgets::{Block, Borders, Paragraph};
@@ -33,6 +36,8 @@ impl App {
     ///
     /// Returns an [`io::Error`] if any I/O error occurs.
     pub fn run(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
+        setup_extended_terminal_mode(terminal).unwrap_or_else(|error| warn!("{error}"));
+
         while !self.exit {
             terminal.draw(|frame| self.draw(frame))?;
             self.handle_events()?;
@@ -152,4 +157,13 @@ impl Widget for &App {
             }
         }
     }
+}
+
+fn setup_extended_terminal_mode(terminal: &mut DefaultTerminal) -> io::Result<()> {
+    enable_raw_mode()?;
+
+    execute!(
+        terminal.backend_mut(),
+        PushKeyboardEnhancementFlags(KeyboardEnhancementFlags::REPORT_EVENT_TYPES)
+    )
 }
