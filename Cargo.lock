@@ -1542,6 +1542,7 @@ dependencies = [
  "env_logger",
  "log",
  "ratatui",
+ "rusb",
  "uml",
 ]
 

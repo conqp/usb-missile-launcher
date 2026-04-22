@@ -3,7 +3,8 @@
 use std::process::ExitCode;
 
 use log::error;
-use uml::MissileLauncher;
+use rusb::Context;
+use uml::OpenMissileLauncher;
 
 use self::app::App;
 
@@ -14,7 +15,9 @@ mod table;
 fn main() -> ExitCode {
     env_logger::init();
 
-    let Ok(missile_launcher) = MissileLauncher::open().inspect_err(|error| error!("{error}"))
+    let Ok(missile_launcher) = Context::new()
+        .and_then(OpenMissileLauncher::open_missile_launcher)
+        .inspect_err(|error| error!("{error}"))
     else {
         return ExitCode::FAILURE;
     };

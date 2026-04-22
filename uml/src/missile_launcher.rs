@@ -1,12 +1,10 @@
 use std::time::Duration;
 
-use rusb::{Context, DeviceHandle, Error, UsbContext};
+use rusb::{Context, DeviceHandle};
 
-use crate::control::Control;
 use crate::Command;
+use crate::control::Control;
 
-const VID: u16 = 0x0416;
-const PID: u16 = 0x9391;
 const DEFAULT_TIMEOUT: Duration = Duration::from_secs(1);
 
 /// A USB missile launcher.
@@ -20,24 +18,6 @@ impl MissileLauncher {
     #[must_use]
     pub const fn new(handle: DeviceHandle<Context>) -> Self {
         Self { handle }
-    }
-
-    /// Open the missile launcher from the given VID and PID.
-    ///
-    /// # Errors
-    ///
-    /// Returns an [`Error`] if opening the device fails.
-    pub fn open_with_vid_pid(vid: u16, pid: u16) -> rusb::Result<Self> {
-        Context::new()?.open_device_with_vid_pid(vid, pid).ok_or(Error::NoDevice).map(Self::new)
-    }
-
-    /// Open the missile launcher from the default VID and PID.
-    ///
-    /// # Errors
-    ///
-    /// Returns an [`Error`] if opening the device fails.
-    pub fn open() -> rusb::Result<Self> {
-        Self::open_with_vid_pid(VID, PID)
     }
 
     /// Send a command with a given timeout to the missile launcher.
