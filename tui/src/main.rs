@@ -1,7 +1,8 @@
 //! TUI controller for the USB missile launcher.
 
-use std::error::Error;
+use std::process::ExitCode;
 
+use log::error;
 use uml::MissileLauncher;
 
 use self::app::App;
@@ -10,10 +11,18 @@ mod app;
 mod extended_terminal;
 mod table;
 
-fn main() -> Result<(), Box<dyn Error>> {
+fn main() -> ExitCode {
     env_logger::init();
 
-    let missile_launcher = MissileLauncher::open()?;
-    ratatui::run(|terminal| App::new(missile_launcher).run(terminal))?;
-    Ok(())
+    let Ok(missile_launcher) = MissileLauncher::open().inspect_err(|error| error!("{error}"))
+    else {
+        return ExitCode::FAILURE;
+    };
+
+    if let Err(error) = ratatui::run(|terminal| App::new(missile_launcher).run(terminal)) {
+        error!("{error}");
+        return ExitCode::FAILURE;
+    }
+
+    ExitCode::SUCCESS
 }
