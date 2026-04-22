@@ -1,2 +1,2 @@
-# usb-nerf-missile-launcher
-Library and controller programs for the center USB nerf missile launcher
+# usb-missile-launcher
+Library and controller programs for the _center_ USB missile launcher
