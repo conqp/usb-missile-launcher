@@ -1,11 +1,23 @@
+/// Commands available for the missile launcher.
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 #[repr(u8)]
 pub enum Command {
+    /// Yaw left.
     Left = 0x08,
+
+    /// Yaw right.
     Right = 0x04,
+
+    /// Pitch up.
     Up = 0x02,
+
+    /// Pitch down.
     Down = 0x01,
+
+    /// Fire missiles.
     Fire = 0x10,
+
+    /// Stop any previous action.
     Stop = 0x00,
 }
 

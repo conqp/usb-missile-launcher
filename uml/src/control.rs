@@ -1,20 +1,20 @@
 /// Control a missile launcher.
 pub trait Control {
-    /// Aim the missile launcher left.
+    /// Yaw left.
     fn left(&mut self) -> rusb::Result<()>;
 
-    /// Aim the missile launcher right.
+    /// Yaw right.
     fn right(&mut self) -> rusb::Result<()>;
 
-    /// Aim the missile launcher up.
+    /// Pitch up.
     fn up(&mut self) -> rusb::Result<()>;
 
-    /// Aim the missile launcher down.
+    /// Pitch down.
     fn down(&mut self) -> rusb::Result<()>;
 
-    /// Fire the missile launcher.
+    /// Fire missiles.
     fn fire(&mut self) -> rusb::Result<()>;
 
-    /// Stop the missile launcher.
+    /// Stop any current action.
     fn stop(&mut self) -> rusb::Result<()>;
 }
