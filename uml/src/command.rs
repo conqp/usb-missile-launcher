@@ -2,23 +2,23 @@
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 #[repr(u8)]
 pub enum Command {
-    /// Yaw left.
-    Left = 0x08,
-
-    /// Yaw right.
-    Right = 0x04,
-
-    /// Pitch up.
-    Up = 0x02,
+    /// Stop any previous action.
+    Stop = 0x00,
 
     /// Pitch down.
     Down = 0x01,
 
+    /// Pitch up.
+    Up = 0x02,
+
+    /// Yaw right.
+    Right = 0x04,
+
+    /// Yaw left.
+    Left = 0x08,
+
     /// Fire missiles.
     Fire = 0x10,
-
-    /// Stop any previous action.
-    Stop = 0x00,
 }
 
 impl Command {
