@@ -1,4 +1,5 @@
 use std::io;
+use std::num::TryFromIntError;
 
 use crossterm::event::{
     Event, KeyCode, KeyEvent, KeyEventKind, KeyboardEnhancementFlags, PushKeyboardEnhancementFlags,
@@ -126,36 +127,12 @@ impl Widget for &App {
 
         outer_block.render(centered, buf);
 
-        // Build 3 rows inside inner block
-        let rows = Layout::default()
-            .direction(Direction::Vertical)
-            .constraints([
-                Constraint::Percentage(33),
-                Constraint::Percentage(34),
-                Constraint::Percentage(33),
-            ])
-            .split(inner);
-
-        let values = [["", "^", ""], ["<", "<Enter>", ">"], ["", "v", ""]];
-
-        for (row_idx, row_area) in rows.iter().enumerate() {
-            let cols = Layout::default()
-                .direction(Direction::Horizontal)
-                .constraints([
-                    Constraint::Percentage(33),
-                    Constraint::Percentage(34),
-                    Constraint::Percentage(33),
-                ])
-                .split(*row_area);
-
-            for (col_idx, cell_area) in cols.iter().enumerate() {
-                let cell = Paragraph::new(values[row_idx][col_idx])
-                    .style(Style::default())
-                    .alignment(Alignment::Center);
-
-                cell.render(*cell_area, buf);
-            }
-        }
+        make_table(
+            [["", "^", ""], ["<", "<Enter>", ">"], ["", "v", ""]],
+            inner,
+            buf,
+        )
+        .expect("Table fits into u16.");
     }
 }
 
@@ -166,4 +143,36 @@ fn setup_extended_terminal_mode(terminal: &mut DefaultTerminal) -> io::Result<()
         terminal.backend_mut(),
         PushKeyboardEnhancementFlags(KeyboardEnhancementFlags::REPORT_EVENT_TYPES)
     )
+}
+
+fn make_table<'a, const COLS: usize, const ROWS: usize, T>(
+    elements: [[T; COLS]; ROWS],
+    parent: Rect,
+    buffer: &mut Buffer,
+) -> Result<(), TryFromIntError>
+where
+    T: Into<Text<'a>>,
+{
+    // Build 3 rows inside inner block
+    let rows = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([Constraint::Percentage(u16::try_from(100usize / ROWS)?); ROWS])
+        .split(parent);
+
+    for (row_area, row) in rows.iter().zip(elements) {
+        let cols = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints([Constraint::Percentage(u16::try_from(100usize / COLS)?); COLS])
+            .split(*row_area);
+
+        for (cell_area, cell) in cols.iter().zip(row) {
+            let cell = Paragraph::new(cell)
+                .style(Style::default())
+                .alignment(Alignment::Center);
+
+            cell.render(*cell_area, buffer);
+        }
+    }
+
+    Ok(())
 }
