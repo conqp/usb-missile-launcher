@@ -1,9 +1,9 @@
 //! Library to control a USB missile launcher.
 
-pub use command::Command;
-pub use control::Control;
-pub use missile_launcher::MissileLauncher;
-pub use open_missile_launcher::OpenMissileLauncher;
+pub use self::command::Command;
+pub use self::control::Control;
+pub use self::missile_launcher::MissileLauncher;
+pub use self::open_missile_launcher::OpenMissileLauncher;
 
 mod command;
 mod control;
