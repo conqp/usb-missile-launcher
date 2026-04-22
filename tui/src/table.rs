@@ -20,7 +20,6 @@ where
     T: Into<Text<'static>>,
 {
     fn render(self, area: Rect, buf: &mut Buffer) {
-        // Build 3 rows inside inner block
         let rows = Layout::default()
             .direction(Direction::Vertical)
             .constraints(
