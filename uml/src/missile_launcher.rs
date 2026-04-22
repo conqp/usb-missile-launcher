@@ -59,7 +59,7 @@ impl MissileLauncher {
     /// # Errors
     ///
     /// Returns an [`rusb::Error`] if sending the command fails.
-    pub fn send_command_timeout(
+    pub fn send_command_with_timeout(
         &mut self,
         command: Command,
         timeout: Duration,
@@ -74,7 +74,7 @@ impl MissileLauncher {
     ///
     /// Returns an [`rusb::Error`] if sending the command fails.
     pub fn send_command(&mut self, command: Command) -> rusb::Result<()> {
-        self.send_command_timeout(command, DEFAULT_TIMEOUT)
+        self.send_command_with_timeout(command, DEFAULT_TIMEOUT)
             .map(drop)
     }
 }
