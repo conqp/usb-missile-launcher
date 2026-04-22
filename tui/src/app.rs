@@ -1,5 +1,4 @@
 use std::io;
-use std::time::Duration;
 
 use crossterm::event;
 use crossterm::event::{Event, KeyCode, KeyEvent, KeyEventKind};
@@ -69,8 +68,8 @@ impl App {
 
         self.last_command.replace(command);
         self.missile_launcher
-            .send_command(command, Duration::from_secs(1))
-            .map_or_else(|error| error!("{error}"), drop);
+            .send_command(command)
+            .unwrap_or_else(|error| error!("{error}"));
     }
 
     fn handle_key_event(&mut self, key_event: KeyEvent) {

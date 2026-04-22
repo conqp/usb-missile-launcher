@@ -24,6 +24,10 @@ impl MissileLauncher {
     }
 
     /// Open the missile launcher from the given VID and PID.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`rusb::Error`] if opening the device fails.
     pub fn from_descriptor(vid: u16, pid: u16) -> rusb::Result<Self> {
         for device in Context::new()?.devices()?.iter() {
             match device.device_descriptor() {
@@ -42,39 +46,61 @@ impl MissileLauncher {
     }
 
     /// Open the missile launcher from the default VID and PID.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`rusb::Error`] if opening the device fails.
     pub fn open() -> rusb::Result<Self> {
         Self::from_descriptor(VID, PID)
     }
 
-    /// Send a command to the missile launcher.
-    pub fn send_command(&mut self, command: Command, timeout: Duration) -> rusb::Result<usize> {
+    /// Send a command with a given timeout to the missile launcher.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`rusb::Error`] if sending the command fails.
+    pub fn send_command_timeout(
+        &mut self,
+        command: Command,
+        timeout: Duration,
+    ) -> rusb::Result<usize> {
         self.handle
             .write_control(0x21, 0x09, 0x0300, 0x0000, &command.into_payload(), timeout)
+    }
+
+    /// Send a command to the missile launcher.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`rusb::Error`] if sending the command fails.
+    pub fn send_command(&mut self, command: Command) -> rusb::Result<()> {
+        self.send_command_timeout(command, DEFAULT_TIMEOUT)
+            .map(drop)
     }
 }
 
 impl Control for MissileLauncher {
     fn left(&mut self) -> rusb::Result<()> {
-        self.send_command(Command::Left, DEFAULT_TIMEOUT).map(drop)
+        self.send_command(Command::Left)
     }
 
     fn right(&mut self) -> rusb::Result<()> {
-        self.send_command(Command::Right, DEFAULT_TIMEOUT).map(drop)
+        self.send_command(Command::Right)
     }
 
     fn up(&mut self) -> rusb::Result<()> {
-        self.send_command(Command::Up, DEFAULT_TIMEOUT).map(drop)
+        self.send_command(Command::Up)
     }
 
     fn down(&mut self) -> rusb::Result<()> {
-        self.send_command(Command::Down, DEFAULT_TIMEOUT).map(drop)
+        self.send_command(Command::Down)
     }
 
     fn fire(&mut self) -> rusb::Result<()> {
-        self.send_command(Command::Fire, DEFAULT_TIMEOUT).map(drop)
+        self.send_command(Command::Fire)
     }
 
     fn stop(&mut self) -> rusb::Result<()> {
-        self.send_command(Command::Stop, DEFAULT_TIMEOUT).map(drop)
+        self.send_command(Command::Stop)
     }
 }
