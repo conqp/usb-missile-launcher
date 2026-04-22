@@ -3,10 +3,11 @@ use std::time::Duration;
 
 use crossterm::event;
 use crossterm::event::{Event, KeyCode, KeyEvent, KeyEventKind};
+use crossterm::style::style;
 use log::{debug, error};
 use ratatui::prelude::*;
 use ratatui::symbols::border;
-use ratatui::widgets::{Block, Paragraph};
+use ratatui::widgets::{Block, Cell, Paragraph, Row, Table};
 use ratatui::{DefaultTerminal, Frame};
 use uml::{Command, Control, MissileLauncher};
 
@@ -99,21 +100,27 @@ impl App {
 
 impl Widget for &App {
     fn render(self, area: Rect, buf: &mut Buffer) {
-        let title = Line::from(" Counter App Tutorial ".bold());
+        let title = Line::from(" Missile Launcher Control ".bold());
         let instructions = Line::from(vec![
-            " Decrement ".into(),
+            " Aim left ".into(),
             "<Left>".blue().bold(),
-            " Increment ".into(),
+            " Aim right ".into(),
             "<Right>".blue().bold(),
+            " Aim up ".into(),
+            "<Up>".blue().bold(),
+            " Aim down ".into(),
+            "<Down>".blue().bold(),
+            " Fire ".into(),
+            "<Enter>".blue().bold(),
             " Quit ".into(),
-            "<Q> ".blue().bold(),
+            "<Esc> ".blue().bold(),
         ]);
         let block = Block::bordered()
             .title(title.centered())
             .title_bottom(instructions.centered())
             .border_set(border::THICK);
 
-        Paragraph::new("Foobar")
+        Paragraph::new("Aim and fire the USB missile launcher")
             .centered()
             .block(block)
             .render(area, buf);
