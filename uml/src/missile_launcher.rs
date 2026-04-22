@@ -32,6 +32,8 @@ impl MissileLauncher {
         for device in Context::new()?.devices()?.iter() {
             match device.device_descriptor() {
                 Ok(descriptor) => {
+                    debug!("Found device: {descriptor:?}");
+
                     if descriptor.vendor_id() == vid && descriptor.product_id() == pid {
                         return device.open().map(Self::new);
                     }
