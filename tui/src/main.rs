@@ -8,7 +8,7 @@ use self::app::App;
 
 mod app;
 mod extended_terminal;
-mod make_table;
+mod table;
 
 fn main() -> Result<(), Box<dyn Error>> {
     env_logger::init();

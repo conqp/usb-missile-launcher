@@ -4,13 +4,13 @@ use crossterm::event;
 use crossterm::event::{Event, KeyCode, KeyEvent, KeyEventKind};
 use log::{debug, error, warn};
 use ratatui::layout::Flex;
-use ratatui::prelude::*;
+use ratatui::prelude::{Widget, *};
 use ratatui::widgets::{Block, Borders};
 use ratatui::{DefaultTerminal, Frame};
 use uml::{Command, Control, MissileLauncher};
 
 use crate::extended_terminal::ExtendedTerminal;
-use crate::make_table::MakeTable;
+use crate::table::Table;
 
 #[derive(Debug)]
 pub struct App {
@@ -128,8 +128,6 @@ impl Widget for &App {
 
         outer_block.render(centered, buf);
 
-        inner
-            .make_table([["", "^", ""], ["<", "<Enter>", ">"], ["", "v", ""]], buf)
-            .expect("Table fits into u16.");
+        Table::from([["", "^", ""], ["<", "<Enter>", ">"], ["", "v", ""]]).render(inner, buf);
     }
 }
