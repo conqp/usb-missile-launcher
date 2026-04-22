@@ -3,11 +3,10 @@ use std::time::Duration;
 
 use crossterm::event;
 use crossterm::event::{Event, KeyCode, KeyEvent, KeyEventKind};
-use crossterm::style::style;
 use log::{debug, error};
+use ratatui::layout::Flex;
 use ratatui::prelude::*;
-use ratatui::symbols::border;
-use ratatui::widgets::{Block, Cell, Paragraph, Row, Table};
+use ratatui::widgets::{Block, Borders, Paragraph, Table};
 use ratatui::{DefaultTerminal, Frame};
 use uml::{Command, Control, MissileLauncher};
 
@@ -82,6 +81,7 @@ impl App {
                 KeyCode::Right => self.execute_command(Command::Right),
                 KeyCode::Up => self.execute_command(Command::Up),
                 KeyCode::Down => self.execute_command(Command::Down),
+                KeyCode::Enter => self.execute_command(Command::Fire),
                 other => debug!("Unsupported key pressed: {other:?}"),
             },
             KeyEventKind::Release => match key_event.code {
@@ -101,28 +101,56 @@ impl App {
 impl Widget for &App {
     fn render(self, area: Rect, buf: &mut Buffer) {
         let title = Line::from(" Missile Launcher Control ".bold());
-        let instructions = Line::from(vec![
-            " Aim left ".into(),
-            "<Left>".blue().bold(),
-            " Aim right ".into(),
-            "<Right>".blue().bold(),
-            " Aim up ".into(),
-            "<Up>".blue().bold(),
-            " Aim down ".into(),
-            "<Down>".blue().bold(),
-            " Fire ".into(),
-            "<Enter>".blue().bold(),
-            " Quit ".into(),
-            "<Esc> ".blue().bold(),
-        ]);
-        let block = Block::bordered()
-            .title(title.centered())
-            .title_bottom(instructions.centered())
-            .border_set(border::THICK);
 
-        Paragraph::new("Aim and fire the USB missile launcher")
-            .centered()
-            .block(block)
-            .render(area, buf);
+        // Center the block itself
+        let centered = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints([
+                Constraint::Percentage(50),
+                Constraint::Percentage(50),
+                Constraint::Percentage(50),
+            ])
+            .flex(Flex::Center)
+            .split(area)[1];
+
+        let outer_block = Block::default()
+            .title(title.centered())
+            .borders(Borders::ALL);
+
+        // IMPORTANT: inner area excludes borders
+        let inner = outer_block.inner(centered);
+
+        outer_block.render(centered, buf);
+
+        // Build 3 rows inside inner block
+        let rows = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints([
+                Constraint::Percentage(33),
+                Constraint::Percentage(34),
+                Constraint::Percentage(33),
+            ])
+            .split(inner);
+
+        let values = [["", "^", ""], ["<", "<Enter>", ">"], ["", "v", ""]];
+
+        for (row_idx, row_area) in rows.iter().enumerate() {
+            let cols = Layout::default()
+                .direction(Direction::Horizontal)
+                .constraints([
+                    Constraint::Percentage(33),
+                    Constraint::Percentage(34),
+                    Constraint::Percentage(33),
+                ])
+                .split(*row_area);
+
+            for (col_idx, cell_area) in cols.iter().enumerate() {
+                let cell = Paragraph::new(values[row_idx][col_idx])
+                    .style(Style::default())
+                    .alignment(Alignment::Center);
+
+                cell.render(*cell_area, buf);
+            }
+        }
     }
 }
