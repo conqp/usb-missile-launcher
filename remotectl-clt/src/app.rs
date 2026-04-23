@@ -18,7 +18,6 @@ use crate::table::Table;
 pub struct App {
     client: Client,
     url: Url,
-    last_command: Option<Command>,
     exit: bool,
 }
 
@@ -29,7 +28,6 @@ impl App {
         Self {
             client: Client::new(),
             url,
-            last_command: None,
             exit: false,
         }
     }
@@ -69,17 +67,6 @@ impl App {
     }
 
     fn execute_command(&mut self, command: Command) {
-        if let Some(last_command) = self.last_command.take()
-            && command == last_command
-        {
-            self.client
-                .post(self.url.clone())
-                .json(&Command::Stop)
-                .send()
-                .map_or_else(|error| error!("{error}"), drop);
-        }
-
-        self.last_command.replace(command);
         self.client
             .post(self.url.clone())
             .json(&command)
@@ -100,7 +87,6 @@ impl App {
             },
             KeyEventKind::Release => match key_event.code {
                 KeyCode::Left | KeyCode::Right | KeyCode::Up | KeyCode::Down | KeyCode::Enter => {
-                    self.last_command.take();
                     self.execute_command(Command::Stop);
                 }
                 other => debug!("Unsupported key released: {other:?}"),
