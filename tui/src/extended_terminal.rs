@@ -5,9 +5,9 @@ use crossterm::execute;
 use crossterm::terminal::enable_raw_mode;
 use ratatui::DefaultTerminal;
 
-/// Setup extended terminal functionality.
+/// Set up extended terminal functionality.
 pub trait ExtendedTerminal {
-    /// Setup the terminal for extended event handline.
+    /// Set up the terminal for extended event handline.
     fn setup_extended_events(&mut self) -> Result<()>;
 }
 
