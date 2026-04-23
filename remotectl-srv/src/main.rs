@@ -30,30 +30,27 @@ async fn main() -> ExitCode {
         return ExitCode::FAILURE;
     };
 
-    let mut last_command = None;
-
     loop {
         let Ok(command) = fetch_command(&url)
             .await
             .inspect_err(|error| warn!("{error}"))
         else {
+            missile_launcher
+                .stop()
+                .unwrap_or_else(|error| error!("{error}"));
             sleep(FAILURE_TICK).await;
             continue;
         };
 
-        if last_command != Some(command) {
-            last_command.replace(command);
-
-            match command {
-                Command::Stop => missile_launcher.stop(),
-                Command::Left => missile_launcher.left(),
-                Command::Right => missile_launcher.right(),
-                Command::Up => missile_launcher.up(),
-                Command::Down => missile_launcher.down(),
-                Command::Fire => missile_launcher.fire(),
-            }
-            .unwrap_or_else(|error| error!("{error}"));
+        match command {
+            Command::Stop => missile_launcher.stop(),
+            Command::Left => missile_launcher.left(),
+            Command::Right => missile_launcher.right(),
+            Command::Up => missile_launcher.up(),
+            Command::Down => missile_launcher.down(),
+            Command::Fire => missile_launcher.fire(),
         }
+        .unwrap_or_else(|error| error!("{error}"));
 
         sleep(TICK).await;
     }
