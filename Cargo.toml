@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["tui","uml"]
+members = ["remotectl-clt","remotectl-common", "remotectl-proxy", "remotectl-srv","tui","uml"]
 
 [profile.release]
 strip = true

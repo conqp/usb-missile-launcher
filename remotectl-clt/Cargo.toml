@@ -1,0 +1,16 @@
+[package]
+name = "remotectl-clt"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+clap = "4.6.1"
+crossterm = "0.29.0"
+env_logger = "0.11.10"
+log = "0.4.29"
+ratatui = "0.30.0"
+remotectl-common = { path = "../remotectl-common" }
+reqwest = { version = "0.13.2", features = ["blocking", "json"] }
+
+[lints]
+workspace = true
