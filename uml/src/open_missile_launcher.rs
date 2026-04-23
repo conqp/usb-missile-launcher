@@ -1,5 +1,6 @@
-use crate::MissileLauncher;
 use rusb::{Context, Error, UsbContext};
+
+use crate::MissileLauncher;
 
 const VID: u16 = 0x0416;
 const PID: u16 = 0x9391;
