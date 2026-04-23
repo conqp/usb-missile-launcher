@@ -59,8 +59,11 @@ impl App {
         Ok(())
     }
 
-    const fn exit(&mut self) {
+    fn exit(&mut self) {
         self.exit = true;
+        self.missile_launcher
+            .stop()
+            .unwrap_or_else(|error| error!("{error}"));
     }
 
     fn execute_command(&mut self, command: Command) {
