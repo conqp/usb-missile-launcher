@@ -36,38 +36,68 @@ pub trait MissileLauncher {
     ///
     /// # Errors
     ///
-    /// Returns an [`Error`] if sending the command fails.
+    /// Returns an [`Error`] if the communication with the USB device fails.
     fn send_command_with_timeout(&mut self, command: Command, timeout: Duration) -> Result<()>;
 
     /// Send a command to the missile launcher.
     ///
     /// # Errors
     ///
-    /// Returns an [`Error`] if sending the command fails.
+    /// Returns an [`Error`] if the communication with the USB device fails.
     fn send_command(&mut self, command: Command) -> Result<()> {
         self.send_command_with_timeout(command, DEFAULT_TIMEOUT)
     }
 
+    /// Yaw the missile launcher left.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error`] if the communication with the USB device fails.
     fn left(&mut self) -> Result<()> {
         self.send_command(Command::Left)
     }
 
+    /// Yaw the missile launcher right.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error`] if the communication with the USB device fails.
     fn right(&mut self) -> Result<()> {
         self.send_command(Command::Right)
     }
 
+    /// Pitch the missile launcher up.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error`] if the communication with the USB device fails.
     fn up(&mut self) -> Result<()> {
         self.send_command(Command::Up)
     }
 
+    /// Pitch the missile launcher down.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error`] if the communication with the USB device fails.
     fn down(&mut self) -> Result<()> {
         self.send_command(Command::Down)
     }
 
+    /// Fire the missile launcher.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error`] if the communication with the USB device fails.
     fn fire(&mut self) -> Result<()> {
         self.send_command(Command::Fire)
     }
 
+    /// Stop any previous action on the missile launcher.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error`] if the communication with the USB device fails.
     fn stop(&mut self) -> Result<()> {
         self.send_command(Command::Stop)
     }
