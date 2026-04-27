@@ -61,7 +61,7 @@ impl MissileLauncher {
             .wait()?
             .control_out(
                 ControlOut {
-                    control_type: ControlType::Vendor,
+                    control_type: ControlType::Class,
                     recipient: Recipient::Interface,
                     request: 0x09,
                     value: 0x0300,
