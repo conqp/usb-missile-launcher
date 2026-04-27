@@ -2,7 +2,7 @@ use nusb::transfer::{ControlOut, ControlType, Recipient};
 
 /// Extension trait to return a data payload as a [`ControlOut`] packet.
 pub trait AsControlOut {
-    /// Return the data payload as a [`ControlOut` ]packet.
+    /// Return the data payload as a [`ControlOut`] packet.
     fn as_control_out(&self) -> ControlOut<'_>;
 }
 
