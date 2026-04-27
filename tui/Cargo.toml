@@ -9,7 +9,6 @@ ratatui = "0.30.0"
 uml = { path = "../uml" }
 log = "0.4.29"
 env_logger = "0.11.10"
-rusb = "0.9.4"
 
 [lints]
 workspace = true

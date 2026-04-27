@@ -1,20 +1,22 @@
+use std::io::Result;
+
 /// Control a missile launcher.
 pub trait Control {
     /// Yaw left.
-    fn left(&mut self) -> rusb::Result<()>;
+    fn left(&mut self) -> Result<()>;
 
     /// Yaw right.
-    fn right(&mut self) -> rusb::Result<()>;
+    fn right(&mut self) -> Result<()>;
 
     /// Pitch up.
-    fn up(&mut self) -> rusb::Result<()>;
+    fn up(&mut self) -> Result<()>;
 
     /// Pitch down.
-    fn down(&mut self) -> rusb::Result<()>;
+    fn down(&mut self) -> Result<()>;
 
     /// Fire missiles.
-    fn fire(&mut self) -> rusb::Result<()>;
+    fn fire(&mut self) -> Result<()>;
 
     /// Stop any current action.
-    fn stop(&mut self) -> rusb::Result<()>;
+    fn stop(&mut self) -> Result<()>;
 }

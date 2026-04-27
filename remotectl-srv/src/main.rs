@@ -7,9 +7,8 @@ use clap::Parser;
 use log::{error, warn};
 use remotectl_common::{Args, Command};
 use reqwest::{Url, get};
-use rusb::Context;
 use tokio::time::sleep;
-use uml::{Control, OpenMissileLauncher};
+use uml::{Control, MissileLauncher};
 
 const TICK: Duration = Duration::from_millis(100);
 const FAILURE_TICK: Duration = Duration::from_secs(1);
@@ -18,9 +17,7 @@ const FAILURE_TICK: Duration = Duration::from_secs(1);
 async fn main() -> ExitCode {
     env_logger::init();
 
-    let Ok(mut missile_launcher) = Context::new()
-        .and_then(OpenMissileLauncher::open_missile_launcher)
-        .inspect_err(|error| error!("{error}"))
+    let Ok(mut missile_launcher) = MissileLauncher::open().inspect_err(|error| error!("{error}"))
     else {
         return ExitCode::FAILURE;
     };
