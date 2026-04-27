@@ -7,14 +7,14 @@ use ratatui::layout::Flex;
 use ratatui::prelude::{Widget, *};
 use ratatui::widgets::{Block, Borders};
 use ratatui::{DefaultTerminal, Frame};
-use uml::{Command, Control, MissileLauncher};
+use uml::{Command, Device, MissileLauncher};
 
 use crate::extended_terminal::ExtendedTerminal;
 use crate::table::Table;
 
 #[derive(Debug)]
 pub struct App {
-    missile_launcher: MissileLauncher,
+    missile_launcher: Device,
     last_command: Option<Command>,
     exit: bool,
 }
@@ -22,7 +22,7 @@ pub struct App {
 impl App {
     /// Crate a new application.
     #[must_use]
-    pub const fn new(missile_launcher: MissileLauncher) -> Self {
+    pub const fn new(missile_launcher: Device) -> Self {
         Self {
             missile_launcher,
             last_command: None,

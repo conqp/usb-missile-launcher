@@ -3,7 +3,6 @@ use std::time::Duration;
 
 use nusb::{Device, MaybeFuture, list_devices};
 
-use crate::control::Control;
 use crate::{AsControlOut, Command};
 
 const DEFAULT_TIMEOUT: Duration = Duration::from_secs(1);
@@ -11,40 +10,25 @@ const VID: u16 = 0x0416;
 const PID: u16 = 0x9391;
 
 /// A USB missile launcher.
-#[derive(Debug)]
-pub struct MissileLauncher {
-    device: Device,
-}
-
-impl MissileLauncher {
-    /// Crate a new USB missile launcher.
-    #[must_use]
-    pub const fn new(device: Device) -> Self {
-        Self { device }
-    }
-
+pub trait MissileLauncher {
     /// Open the missile launcher with the given VID and PID.
     ///
     /// # Errors
     ///
     /// Returns an [`Error`] if opening the launcher fails.
-    pub fn open_with_vid_and_pid(vid: u16, pid: u16) -> Result<MissileLauncher> {
-        Ok(Self::new(
-            list_devices()
-                .wait()?
-                .find(|dev| dev.vendor_id() == vid && dev.product_id() == pid)
-                .ok_or_else(|| Error::new(ErrorKind::NotFound, "device not found"))?
-                .open()
-                .wait()?,
-        ))
-    }
+    fn open_with_vid_and_pid(vid: u16, pid: u16) -> Result<Self>
+    where
+        Self: Sized;
 
     /// Open the missile launcher with the default VID and PID.
     ///
     /// # Errors
     ///
     /// Returns an [`Error`] if opening the launcher fails.
-    pub fn open() -> Result<MissileLauncher> {
+    fn open() -> Result<Self>
+    where
+        Self: Sized,
+    {
         Self::open_with_vid_and_pid(VID, PID)
     }
 
@@ -53,26 +37,17 @@ impl MissileLauncher {
     /// # Errors
     ///
     /// Returns an [`Error`] if sending the command fails.
-    pub fn send_command_with_timeout(&mut self, command: Command, timeout: Duration) -> Result<()> {
-        Ok(self
-            .device
-            .claim_interface(0)
-            .wait()?
-            .control_out(command.into_payload().as_control_out(), timeout)
-            .wait()?)
-    }
+    fn send_command_with_timeout(&mut self, command: Command, timeout: Duration) -> Result<()>;
 
     /// Send a command to the missile launcher.
     ///
     /// # Errors
     ///
     /// Returns an [`Error`] if sending the command fails.
-    pub fn send_command(&mut self, command: Command) -> Result<()> {
+    fn send_command(&mut self, command: Command) -> Result<()> {
         self.send_command_with_timeout(command, DEFAULT_TIMEOUT)
     }
-}
 
-impl Control for MissileLauncher {
     fn left(&mut self) -> Result<()> {
         self.send_command(Command::Left)
     }
@@ -95,5 +70,24 @@ impl Control for MissileLauncher {
 
     fn stop(&mut self) -> Result<()> {
         self.send_command(Command::Stop)
+    }
+}
+
+impl MissileLauncher for Device {
+    fn open_with_vid_and_pid(vid: u16, pid: u16) -> Result<Self> {
+        Ok(list_devices()
+            .wait()?
+            .find(|dev| dev.vendor_id() == vid && dev.product_id() == pid)
+            .ok_or_else(|| Error::new(ErrorKind::NotFound, "device not found"))?
+            .open()
+            .wait()?)
+    }
+
+    fn send_command_with_timeout(&mut self, command: Command, timeout: Duration) -> Result<()> {
+        Ok(self
+            .claim_interface(0)
+            .wait()?
+            .control_out(command.into_payload().as_control_out(), timeout)
+            .wait()?)
     }
 }
