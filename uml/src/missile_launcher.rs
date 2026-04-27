@@ -5,6 +5,7 @@ use nusb::{Device, MaybeFuture, list_devices};
 
 use crate::{AsControlOut, Command};
 
+const DEFAULT_INTERFACE: u8 = 0;
 const DEFAULT_TIMEOUT: Duration = Duration::from_secs(1);
 const VID: u16 = 0x0416;
 const PID: u16 = 0x9391;
@@ -115,7 +116,7 @@ impl MissileLauncher for Device {
 
     fn send_command_with_timeout(&mut self, command: Command, timeout: Duration) -> Result<()> {
         Ok(self
-            .claim_interface(0)
+            .claim_interface(DEFAULT_INTERFACE)
             .wait()?
             .control_out(command.into_payload().as_control_out(), timeout)
             .wait()?)
