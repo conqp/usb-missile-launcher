@@ -6,7 +6,7 @@ pub trait AsControlOut {
     fn as_control_out(&self) -> ControlOut<'_>;
 }
 
-impl<const SIZE: usize> AsControlOut for [u8; SIZE] {
+impl AsControlOut for [u8] {
     fn as_control_out(&self) -> ControlOut<'_> {
         ControlOut {
             control_type: ControlType::Class,
