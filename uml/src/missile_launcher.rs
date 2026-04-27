@@ -1,11 +1,10 @@
 use std::io::{Error, ErrorKind, Result};
 use std::time::Duration;
 
-use nusb::transfer::{ControlOut, ControlType, Recipient};
 use nusb::{Device, MaybeFuture, list_devices};
 
-use crate::Command;
 use crate::control::Control;
+use crate::{AsControlOut, Command};
 
 const DEFAULT_TIMEOUT: Duration = Duration::from_secs(1);
 const VID: u16 = 0x0416;
@@ -59,17 +58,7 @@ impl MissileLauncher {
             .device
             .claim_interface(0)
             .wait()?
-            .control_out(
-                ControlOut {
-                    control_type: ControlType::Class,
-                    recipient: Recipient::Interface,
-                    request: 0x09,
-                    value: 0x0300,
-                    index: 0x0000,
-                    data: &command.into_payload(),
-                },
-                timeout,
-            )
+            .control_out(command.into_payload().as_control_out(), timeout)
             .wait()?)
     }
 
