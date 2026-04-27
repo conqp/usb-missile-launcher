@@ -66,7 +66,7 @@ impl App {
         self.execute_command(Command::Stop);
     }
 
-    fn execute_command(&mut self, command: Command) {
+    fn execute_command(&self, command: Command) {
         self.client
             .post(self.url.clone())
             .json(&command)
